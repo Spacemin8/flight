@@ -14,9 +14,9 @@ interface SEOHeadProps {
   toState?: string;
 }
 
-export function SEOHead({ 
-  title, 
-  description, 
+export function SEOHead({
+  title,
+  description,
   canonicalUrl,
   structuredData,
   imageUrl = 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80',
@@ -36,26 +36,28 @@ export function SEOHead({
     name: title,
     description,
     url: fullUrl,
-    ...(fromCity && toCity && {
-      fromLocation: {
-        '@type': 'City',
-        name: fromCity
-      },
-      toLocation: {
-        '@type': 'City',
-        name: toCity
-      }
-    }),
-    ...(fromState && toState && {
-      fromLocation: {
-        '@type': 'State',
-        name: fromState
-      },
-      toLocation: {
-        '@type': 'State',
-        name: toState
-      }
-    }),
+    ...(fromCity &&
+      toCity && {
+        fromLocation: {
+          '@type': 'City',
+          name: fromCity
+        },
+        toLocation: {
+          '@type': 'City',
+          name: toCity
+        }
+      }),
+    ...(fromState &&
+      toState && {
+        fromLocation: {
+          '@type': 'State',
+          name: fromState
+        },
+        toLocation: {
+          '@type': 'State',
+          name: toState
+        }
+      }),
     provider: {
       '@type': 'TravelAgency',
       name: 'Hima Travel',
@@ -101,7 +103,6 @@ export function SEOHead({
       <html lang="sq" />
       <title>{title}</title>
       <meta name="description" content={description} />
-      <link rel="canonical" href={fullUrl} />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta charSet="UTF-8" />
 
@@ -122,26 +123,33 @@ export function SEOHead({
 
       {/* Additional Meta Tags */}
       <meta name="author" content="Hima Travel" />
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta
+        name="robots"
+        content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+      />
       <meta name="revisit-after" content="7 days" />
-      <meta name="keywords" content="bileta avioni, flight tickets, airline tickets, bileta online, cmime te lira, fluturime, rezervo bileta, oferta udhetimi, bileta te lira, hima travel, agjenci udhetimi, fluturime direkte" />
-      
+      <meta
+        name="keywords"
+        content="bileta avioni, flight tickets, airline tickets, bileta online, cmime te lira, fluturime, rezervo bileta, oferta udhetimi, bileta te lira, hima travel, agjenci udhetimi, fluturime direkte"
+      />
+
       {/* Geo Tags */}
       <meta name="geo.region" content="AL" />
       <meta name="geo.placename" content="Tiranë" />
-      
+
       {/* Mobile Optimization */}
       <meta name="theme-color" content="#2563eb" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+      />
 
       {/* Structured Data / Schema.org */}
       <script type="application/ld+json">
         {JSON.stringify(structuredData || defaultStructuredData)}
       </script>
-      <script type="application/ld+json">
-        {JSON.stringify(faqSchema)}
-      </script>
+      <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
     </Helmet>
   );
 }

@@ -23,9 +23,14 @@ async function generateSitemap() {
 
     // Fetch all routes using pagination
     while (hasMore) {
-      const { data: routes, error, count } = await supabase
+      const {
+        data: routes,
+        error,
+        count
+      } = await supabase
         .from('seo_location_connections')
-        .select(`
+        .select(
+          `
           template_url,
           from_location:from_location_id(
             type, city, state, nga_format
@@ -33,7 +38,9 @@ async function generateSitemap() {
           to_location:to_location_id(
             type, city, state, per_format
           )
-        `, { count: 'exact' })
+        `,
+          { count: 'exact' }
+        )
         .eq('status', 'active')
         .not('template_url', 'is', null)
         .order('template_url')
@@ -49,7 +56,9 @@ async function generateSitemap() {
       hasMore = routes && routes.length === pageSize;
       page++;
 
-      console.log(`Fetched ${routes?.length || 0} routes (page ${page}). Total so far: ${allRoutes.length}`);
+      console.log(
+        `Fetched ${routes?.length || 0} routes (page ${page}). Total so far: ${allRoutes.length}`
+      );
     }
 
     console.log(`Total routes fetched: ${allRoutes.length}`);
@@ -83,13 +92,17 @@ async function generateSitemap() {
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
-  ${allRoutes.map(route => `
+  ${allRoutes
+    .map(
+      (route) => `
   <url>
     <loc>${baseUrl}${route.template_url}</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-  </url>`).join('')}
+  </url>`
+    )
+    .join('')}
 </urlset>`;
 
     // Write to file
@@ -102,20 +115,22 @@ async function generateSitemap() {
     // Store in system_settings table
     const { error: settingsError } = await supabase
       .from('system_settings')
-      .upsert({
-        setting_name: 'sitemap_xml',
-        setting_value: true,
-        description: xml
-      }, {
-        onConflict: 'setting_name'
-      });
+      .upsert(
+        {
+          setting_name: 'sitemap_xml',
+          setting_value: true,
+          description: xml
+        },
+        {
+          onConflict: 'setting_name'
+        }
+      );
 
     if (settingsError) {
       console.error('Error saving sitemap to database:', settingsError);
     } else {
       console.log('✅ Sitemap saved to database');
     }
-
   } catch (err) {
     console.error('Error generating sitemap:', err);
     process.exit(1);
@@ -128,7 +143,7 @@ generateSitemap()
     console.log('🎉 All done!');
     process.exit(0);
   })
-  .catch(err => {
+  .catch((err) => {
     console.error('💥 Fatal error:', err);
     process.exit(1);
   });

@@ -1,5 +1,5 @@
 /// <reference types="vite/client" />
-/// <reference types="vite-ssg" />
+/// <reference types="vite-react-ssg" />
 
 interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string;

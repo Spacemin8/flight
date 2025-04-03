@@ -15,7 +15,7 @@ export async function render(url: string, context: any = {}) {
 
   // Create a helmet context to collect head tags
   const helmetContext = {};
-  
+
   // Render the app to string
   const appHtml = renderToString(
     <HelmetProvider context={helmetContext}>
@@ -36,7 +36,7 @@ export async function render(url: string, context: any = {}) {
       title: helmet.title.toString(),
       meta: helmet.meta.toString(),
       link: helmet.link.toString(),
-      script: helmet.script.toString(),
+      script: helmet.script.toString()
     },
     seoData
   };

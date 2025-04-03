@@ -15,7 +15,7 @@ export async function getAllSeoRoutes() {
     if (error) throw error;
 
     // Return array of route paths
-    return (routes || []).map(route => route.template_url);
+    return (routes || []).map((route) => route.template_url);
   } catch (err) {
     console.error('Error fetching SEO routes:', err);
     return [];
@@ -30,7 +30,8 @@ export async function prefetchRouteData(path: string) {
     // Fetch connection data for this route
     const { data: connection, error } = await supabase
       .from('seo_location_connections')
-      .select(`
+      .select(
+        `
         *,
         from_location:from_location_id(
           id, type, city, state, nga_format
@@ -41,20 +42,21 @@ export async function prefetchRouteData(path: string) {
         template_type:template_type_id(
           id, name, slug
         )
-      `)
+      `
+      )
       .eq('template_url', path)
       .eq('status', 'active')
       .single();
 
     if (error) throw error;
-    
+
     // Fetch template data
     const { data: template } = await supabase
       .from('seo_page_templates')
       .select('*')
       .eq('template_type_id', connection.template_type.id)
       .single();
-      
+
     // Fetch template components
     const { data: components } = await supabase
       .from('seo_template_components')
@@ -62,7 +64,7 @@ export async function prefetchRouteData(path: string) {
       .eq('template_id', template.id)
       .eq('status', 'active')
       .order('display_order');
-      
+
     // Return pre-fetched data
     return {
       connection,

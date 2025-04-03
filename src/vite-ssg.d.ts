@@ -1,22 +1,33 @@
-declare module 'vite-ssg' {
-  import { UserConfig } from 'vite';
-  
-  export interface ViteSsgOptions {
-    script?: string;
+declare module 'vite-react-ssg' {
+  import { ComponentType } from 'react';
+  import { RouteObject } from 'react-router-dom';
+
+  export interface ViteReactSSGOptions {
+    script?: 'sync' | 'async' | 'defer';
     formatting?: 'minify' | 'prettify';
     crittersOptions?: boolean | object;
     dirStyle?: 'nested' | 'flat';
     mock?: boolean;
-    includedRoutes?: (paths: string[]) => string[];
+    routes?: string[];
+    routePatterns?: string[];
     onBeforePageRender?: (route: string) => Promise<void> | void;
     onPageRendered?: (route: string, html: string) => Promise<string> | string;
     onFinished?: () => Promise<void> | void;
   }
-  
-  export function defineConfig(config: UserConfig): UserConfig;
-  
+
+  export interface AppCreator {
+    app: ComponentType;
+    routes?: string[];
+    routeObjects?: RouteObject[];
+    base?: string;
+  }
+
+  export function defineConfig(
+    config: ViteReactSSGOptions
+  ): ViteReactSSGOptions;
+
   export default function viteSsg(
-    builder: any,
-    options?: ViteSsgOptions
+    appCreator: AppCreator | (() => AppCreator),
+    options?: ViteReactSSGOptions
   ): any;
 }

@@ -15,9 +15,14 @@ export default async function handler(req: any, res: any) {
 
     // Fetch all routes using pagination
     while (hasMore) {
-      const { data: routes, error, count } = await supabase
+      const {
+        data: routes,
+        error,
+        count
+      } = await supabase
         .from('seo_location_connections')
-        .select(`
+        .select(
+          `
           template_url,
           from_location:from_location_id(
             type, city, state, nga_format
@@ -25,7 +30,9 @@ export default async function handler(req: any, res: any) {
           to_location:to_location_id(
             type, city, state, per_format
           )
-        `, { count: 'exact' })
+        `,
+          { count: 'exact' }
+        )
         .eq('status', 'active')
         .not('template_url', 'is', null)
         .order('template_url')
@@ -41,7 +48,9 @@ export default async function handler(req: any, res: any) {
       hasMore = routes && routes.length === pageSize;
       page++;
 
-      console.log(`Fetched ${routes?.length || 0} routes (page ${page}). Total so far: ${allRoutes.length}`);
+      console.log(
+        `Fetched ${routes?.length || 0} routes (page ${page}). Total so far: ${allRoutes.length}`
+      );
     }
 
     console.log(`Total routes fetched: ${allRoutes.length}`);
@@ -75,13 +84,17 @@ export default async function handler(req: any, res: any) {
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
-  ${allRoutes.map(route => `
+  ${allRoutes
+    .map(
+      (route) => `
   <url>
     <loc>${baseUrl}${route.template_url}</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-  </url>`).join('')}
+  </url>`
+    )
+    .join('')}
 </urlset>`;
 
     // Set headers and send response

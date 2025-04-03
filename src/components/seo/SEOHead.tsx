@@ -34,14 +34,29 @@ export function SEOHead({
 }: SEOHeadProps) {
   const baseUrl = 'https://biletaavioni.himatravel.com';
   const fullUrl = canonicalUrl ? `${baseUrl}${canonicalUrl}` : baseUrl;
-  
+
   // Default schema if none provided
   const defaultSchema = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Hima Travel - Bileta Avioni',
     url: baseUrl,
-    description: 'Bileta avioni me çmimet më të mira. Rezervoni online fluturime direkte dhe me ndalesë për destinacionet tuaja të preferuara.'
+    description:
+      'Bileta avioni me çmimet më të mira. Rezervoni online fluturime direkte dhe me ndalesë për destinacionet tuaja të preferuara.',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Hima Travel',
+      logo: {
+        '@type': 'ImageObject',
+        url: 'https://himatravel.com/wp-content/uploads/2020/11/logo-768x277.png'
+      },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: '+355 694 767 427',
+        contactType: 'customer service',
+        availableLanguage: ['Albanian', 'English', 'Italian']
+      }
+    }
   };
 
   // Create FAQPage schema for SEO
@@ -84,6 +99,8 @@ export function SEOHead({
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords.join(', ')} />
       <link rel="canonical" href={fullUrl} />
+      <meta charSet="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={type} />
@@ -91,8 +108,11 @@ export function SEOHead({
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       <meta property="og:image" content={imageUrl} />
-      <meta property="og:site_name" content="Hima Travel" />
-      <meta property="og:locale" content={language === 'sq' ? 'sq_AL' : 'en_US'} />
+      <meta property="og:site_name" content="Hima Travel - Bileta Avioni" />
+      <meta
+        property="og:locale"
+        content={language === 'sq' ? 'sq_AL' : 'en_US'}
+      />
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -102,18 +122,29 @@ export function SEOHead({
       <meta name="twitter:image" content={imageUrl} />
 
       {/* Mobile Optimization */}
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta name="theme-color" content="#2563eb" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
-      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+      />
+
+      {/* Additional Meta Tags */}
+      <meta name="author" content="Hima Travel" />
+      <meta
+        name="robots"
+        content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+      />
+      <meta name="revisit-after" content="7 days" />
+      <meta name="language" content={language} />
+      <meta name="geo.region" content="AL" />
+      <meta name="geo.placename" content="Tiranë" />
 
       {/* Structured Data / Schema.org */}
       <script type="application/ld+json">
         {JSON.stringify(schema || defaultSchema)}
       </script>
-      <script type="application/ld+json">
-        {JSON.stringify(faqSchema)}
-      </script>
+      <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
 
       {/* Additional meta tags */}
       {children}

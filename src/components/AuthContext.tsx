@@ -16,18 +16,30 @@ const AuthContext = createContext<AuthContextType>({
   error: null
 });
 
+// Determine if we're in a browser environment
+const isBrowser = typeof window !== 'undefined';
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<AuthError | null>(null);
 
   useEffect(() => {
+    // Only run auth initialization in browser environment
+    if (!isBrowser) {
+      setLoading(false);
+      return;
+    }
+
     // Check active sessions and sets the user
     const initializeAuth = async () => {
       try {
         // Get current session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+          error: sessionError
+        } = await supabase.auth.getSession();
+
         if (sessionError) {
           if (sessionError.message.includes('session_not_found')) {
             // Clear any stale session data
@@ -44,7 +56,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
 
         // Listen for changes on auth state (signed in, signed out, etc.)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const {
+          data: { subscription }
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
           if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
             setUser(null);
             // Clear any stored tokens
@@ -53,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
             setUser(session?.user ?? null);
           }
-          
+
           setLoading(false);
           setError(null);
         });
@@ -74,20 +88,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = async () => {
+    if (!isBrowser) return;
+
     try {
       // First try to get current session
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session }
+      } = await supabase.auth.getSession();
+
       // Only attempt sign out if there's an active session
       if (session) {
         const { error: signOutError } = await supabase.auth.signOut();
         if (signOutError) throw signOutError;
       }
-      
+
       // Clear any stored tokens
       localStorage.removeItem('supabase.auth.token');
       sessionStorage.removeItem('supabase.auth.token');
-      
+
       setUser(null);
       setError(null);
     } catch (err) {
