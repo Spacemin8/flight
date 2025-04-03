@@ -9,7 +9,7 @@ import { PopularRoutes } from '../components/home/PopularRoutes';
 import { City } from '../types/search';
 import { formatDateForAPI } from '../utils/format';
 import { Award, Clock, Shield, Phone, Search, ArrowRight } from 'lucide-react';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHeader } from '../components/seo/SEOHeader';
 import { getDefaultSEOData } from '../utils/seo';
 
 function HomePage() {
@@ -30,7 +30,7 @@ function HomePage() {
   });
 
   const seoData = getDefaultSEOData('home');
-  
+
   // Create rich schema for homepage
   const schema = {
     '@context': 'https://schema.org',
@@ -39,7 +39,8 @@ function HomePage() {
     url: 'https://biletaavioni.himatravel.com',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://biletaavioni.himatravel.com/results?batch_id={search_term_string}',
+      target:
+        'https://biletaavioni.himatravel.com/results?batch_id={search_term_string}',
       'query-input': 'required name=search_term_string'
     },
     publisher: {
@@ -74,8 +75,10 @@ function HomePage() {
       setLoading(true);
       setError(null);
 
-      console.log(`Starting ${tripType} search from ${fromCity.code} to ${toCity.code}`);
-      
+      console.log(
+        `Starting ${tripType} search from ${fromCity.code} to ${toCity.code}`
+      );
+
       const batchId = uuidv4();
       const searchParams = {
         fromLocation: fromCity.name,
@@ -98,15 +101,17 @@ function HomePage() {
       // Save search to database
       const { data: savedSearch, error: saveError } = await supabase
         .from('saved_searches')
-        .insert([{
-          batch_id: batchId,
-          user_id: user?.id || null,
-          search_params: searchParams,
-          results: null,
-          cached_results: null,
-          cached_until: null,
-          price_stability_level: 'MEDIUM'
-        }])
+        .insert([
+          {
+            batch_id: batchId,
+            user_id: user?.id || null,
+            search_params: searchParams,
+            results: null,
+            cached_results: null,
+            cached_until: null,
+            price_stability_level: 'MEDIUM'
+          }
+        ])
         .select()
         .single();
 
@@ -121,7 +126,7 @@ function HomePage() {
 
       // Store flag in sessionStorage to indicate this is a new search
       sessionStorage.setItem(`search_${batchId}`, 'true');
-      
+
       // Store direct flights preference
       if (directFlightsOnly) {
         sessionStorage.setItem(`direct_${batchId}`, 'true');
@@ -130,14 +135,15 @@ function HomePage() {
       // Navigate to results page with batch_id
       console.log('Navigating to results with batch ID:', batchId);
       window.scrollTo(0, 0);
-      navigate(`/results?batch_id=${batchId}`, { 
+      navigate(`/results?batch_id=${batchId}`, {
         replace: true,
         state: { searchParams }
       });
-
     } catch (err) {
       console.error('Search error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to search for flights');
+      setError(
+        err instanceof Error ? err.message : 'Failed to search for flights'
+      );
       setLoading(false);
     }
   };
@@ -148,7 +154,7 @@ function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-500 to-blue-700">
-      <SEOHead 
+      <SEOHeader
         title={seoData.title}
         description={seoData.description}
         canonicalUrl={seoData.canonicalUrl}
@@ -172,7 +178,7 @@ function HomePage() {
         ]}
         language={seoData.language}
       />
-      
+
       <HeroSection>
         <SearchModule
           onSearch={handleSearch}
@@ -205,7 +211,8 @@ function HomePage() {
               Pse të zgjidhni Hima Travel?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Me mbi 12 vjet eksperiencë në industrinë e udhëtimit, ne ofrojmë shërbimin më të mirë dhe çmimet më konkurruese në treg.
+              Me mbi 12 vjet eksperiencë në industrinë e udhëtimit, ne ofrojmë
+              shërbimin më të mirë dhe çmimet më konkurruese në treg.
             </p>
           </div>
 
@@ -214,9 +221,12 @@ function HomePage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                 <Award className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Eksperiencë e Gjatë</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Eksperiencë e Gjatë
+              </h3>
               <p className="text-gray-600">
-                12+ vjet eksperiencë në organizimin e udhëtimeve dhe shitjen e biletave.
+                12+ vjet eksperiencë në organizimin e udhëtimeve dhe shitjen e
+                biletave.
               </p>
             </div>
 
@@ -224,7 +234,9 @@ function HomePage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                 <Clock className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">24/7 Online</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                24/7 Online
+              </h3>
               <p className="text-gray-600">
                 Gjeni ofertat me te mira per Bileta Avioni 24/7 Online.
               </p>
@@ -234,9 +246,12 @@ function HomePage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                 <Shield className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Garanci Çmimi</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Garanci Çmimi
+              </h3>
               <p className="text-gray-600">
-                Ofrojmë çmimet më të mira të garantuara për të gjitha destinacionet.
+                Ofrojmë çmimet më të mira të garantuara për të gjitha
+                destinacionet.
               </p>
             </div>
 
@@ -244,7 +259,9 @@ function HomePage() {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
                 <Phone className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Rezervim i Thjeshtë</h3>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Rezervim i Thjeshtë
+              </h3>
               <p className="text-gray-600">
                 Proces i shpejtë dhe i thjeshtë rezervimi online ose me telefon.
               </p>
@@ -255,9 +272,12 @@ function HomePage() {
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-8 text-white text-center">
               <Search className="w-12 h-12 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-4">Kerko Çmimet me te Mira</h3>
+              <h3 className="text-2xl font-bold mb-4">
+                Kerko Çmimet me te Mira
+              </h3>
               <p className="mb-6">
-                Perdor modulin e kerkimit per te gjetur ofertat me te mira per destinacionin tend te preferuar.
+                Perdor modulin e kerkimit per te gjetur ofertat me te mira per
+                destinacionin tend te preferuar.
               </p>
               <button
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
@@ -271,9 +291,12 @@ function HomePage() {
 
             <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-8 text-white text-center">
               <Phone className="w-12 h-12 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold mb-4">Kontakto Agjentët Tanë</h3>
+              <h3 className="text-2xl font-bold mb-4">
+                Kontakto Agjentët Tanë
+              </h3>
               <p className="mb-6">
-                Preferon te flasësh me nje nga agjentet tane? Na kontakto direkt ne numrin tone.
+                Preferon te flasësh me nje nga agjentet tane? Na kontakto direkt
+                ne numrin tone.
               </p>
               <button
                 onClick={handleContactAgent}

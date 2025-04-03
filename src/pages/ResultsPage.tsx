@@ -9,7 +9,10 @@ import { FlightList } from '../components/results/FlightList';
 import { LoadingState } from '../components/results/LoadingState';
 import { ErrorState } from '../components/results/ErrorState';
 import { FlightDetailModal } from '../components/results/FlightDetailModal';
-import { FlightFilterPanel, FilterState } from '../components/results/filters/FlightFilterPanel';
+import {
+  FlightFilterPanel,
+  FilterState
+} from '../components/results/filters/FlightFilterPanel';
 import { SortingOptions } from '../components/results/SortingOptions';
 import { ProgressBar } from '../components/results/ProgressBar';
 import { ShowMoreButton } from '../components/results/ShowMoreButton';
@@ -19,7 +22,7 @@ import { refreshFlightData } from '../utils/flightData';
 import { AdSidebar } from '../components/results/AdSidebar';
 import { MobileAd } from '../components/results/MobileAd';
 import { parseISODate, formatDateForAPI } from '../utils/format';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHeader } from '../components/SEO/SEOHeader';
 import { getDefaultSEOData } from '../utils/seo';
 
 function ResultsPage() {
@@ -27,7 +30,7 @@ function ResultsPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const batchId = searchParams.get('batch_id');
-  
+
   // Add guard flag ref
   const fetchCalledRef = useRef<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -43,7 +46,9 @@ function ResultsPage() {
       other_flights: FlightOption[];
     } | null;
   } | null>(null);
-  const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(null);
+  const [selectedFlight, setSelectedFlight] = useState<FlightOption | null>(
+    null
+  );
   const [refreshing, setRefreshing] = useState(false);
   const [searchProgress, setSearchProgress] = useState<{
     progress: number;
@@ -63,7 +68,7 @@ function ResultsPage() {
   const [sortBy, setSortBy] = useState<SortOption>('best');
   const [processedFlights, setProcessedFlights] = useState<FlightOption[]>([]);
   const [isFiltersPanelOpen, setIsFiltersPanelOpen] = useState(false);
-  
+
   // Show more functionality
   const [visibleFlights, setVisibleFlights] = useState(5);
   const FLIGHTS_PER_PAGE = 5;
@@ -101,7 +106,7 @@ function ResultsPage() {
 
       // Apply filters
       const filteredFlights = applyFilters(
-        allFlights, 
+        allFlights,
         filters,
         searchData.searchParams.tripType === 'roundTrip'
       );
@@ -109,13 +114,18 @@ function ResultsPage() {
       // Apply sorting
       const sortedFlights = await sortFlights(filteredFlights, sortBy);
       setProcessedFlights(sortedFlights);
-      
+
       // Reset visible flights when filters/sorting changes
       setVisibleFlights(FLIGHTS_PER_PAGE);
     };
 
     processFlights();
-  }, [searchData?.searchResults, filters, sortBy, searchData?.searchParams.tripType]);
+  }, [
+    searchData?.searchResults,
+    filters,
+    sortBy,
+    searchData?.searchParams.tripType
+  ]);
 
   // Main data fetching logic
   const fetchSearchData = useCallback(async () => {
@@ -125,8 +135,10 @@ function ResultsPage() {
     }
 
     // Log fetch attempt
-    console.log(`[${new Date().toISOString()}] Fetching data for batch: ${batchId}`);
-    
+    console.log(
+      `[${new Date().toISOString()}] Fetching data for batch: ${batchId}`
+    );
+
     // Set guard flag
     fetchCalledRef.current = batchId;
 
@@ -181,7 +193,7 @@ function ResultsPage() {
         setRefreshing(true);
         try {
           const refreshedResults = await refreshFlightData(
-            searchData.search_params, 
+            searchData.search_params,
             batchId,
             (progress) => {
               if (progress.isComplete) {
@@ -204,7 +216,7 @@ function ResultsPage() {
           }
         } catch (refreshError) {
           console.error('Error refreshing flight data:', refreshError);
-          
+
           if (searchData.cached_results) {
             setSearchData({
               searchParams: searchData.search_params,
@@ -220,12 +232,12 @@ function ResultsPage() {
         setRefreshing(true);
         try {
           const refreshedResults = await refreshFlightData(
-            searchData.search_params, 
+            searchData.search_params,
             batchId,
             (progress) => {
               setSearchProgress({
                 progress: progress.progress,
-                message: progress.isComplete 
+                message: progress.isComplete
                   ? 'Search complete!'
                   : `Found ${progress.results.best_flights.length + progress.results.other_flights.length} flights...`,
                 isComplete: progress.isComplete,
@@ -233,7 +245,10 @@ function ResultsPage() {
               });
 
               // Update results as they come in
-              if (progress.results.best_flights.length > 0 || progress.results.other_flights.length > 0) {
+              if (
+                progress.results.best_flights.length > 0 ||
+                progress.results.other_flights.length > 0
+              ) {
                 setSearchData({
                   searchParams: searchData.search_params,
                   searchResults: progress.results
@@ -257,7 +272,7 @@ function ResultsPage() {
           }
         } catch (refreshError) {
           console.error('Error refreshing flight data:', refreshError);
-          
+
           if (searchData.cached_results) {
             setSearchData({
               searchParams: searchData.search_params,
@@ -270,13 +285,16 @@ function ResultsPage() {
       }
 
       setLoading(false);
-      
+
       // Clear the search flow flag
       sessionStorage.removeItem(`search_${batchId}`);
-
     } catch (err) {
       console.error('Error in fetchSearchData:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load search results. Please try again.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to load search results. Please try again.'
+      );
       setLoading(false);
       setRefreshing(false);
       setSearchProgress(null);
@@ -309,19 +327,22 @@ function ResultsPage() {
   };
 
   const handleShowMore = () => {
-    setVisibleFlights(prev => Math.min(prev + FLIGHTS_PER_PAGE, processedFlights.length));
+    setVisibleFlights((prev) =>
+      Math.min(prev + FLIGHTS_PER_PAGE, processedFlights.length)
+    );
   };
 
   // Generate dynamic SEO data based on search parameters
   const generateDynamicSEO = () => {
     if (!searchData?.searchParams) return seoData;
 
-    const { fromLocation, toLocation, tripType, departureDate } = searchData.searchParams;
-    
+    const { fromLocation, toLocation, tripType, departureDate } =
+      searchData.searchParams;
+
     // Create a more specific title and description
     const title = `Bileta Avioni ${fromLocation} - ${toLocation} | ${tripType === 'roundTrip' ? 'Vajtje-Ardhje' : 'Vetëm Vajtje'} | Hima Travel`;
     const description = `Rezervoni bileta avioni ${fromLocation.toLowerCase()} - ${toLocation.toLowerCase()} ${tripType === 'roundTrip' ? 'vajtje-ardhje' : 'vetëm vajtje'} me çmimet më të mira. Krahasoni fluturime dhe zgjidhni ofertën më të mirë.`;
-    
+
     // Create schema for flight search results
     const schema = {
       '@context': 'https://schema.org',
@@ -373,7 +394,7 @@ function ResultsPage() {
   if (loading && !searchData?.searchResults) {
     return (
       <>
-        <SEOHead 
+        <SEOHeader
           title={dynamicSEO.title}
           description={dynamicSEO.description}
           canonicalUrl={dynamicSEO.canonicalUrl}
@@ -390,7 +411,7 @@ function ResultsPage() {
   if (error && !searchData?.searchResults) {
     return (
       <>
-        <SEOHead 
+        <SEOHead
           title={dynamicSEO.title}
           description={dynamicSEO.description}
           canonicalUrl={dynamicSEO.canonicalUrl}
@@ -398,18 +419,14 @@ function ResultsPage() {
           keywords={dynamicSEO.keywords}
           language={dynamicSEO.language}
         />
-        <ErrorState 
-          message={error} 
-          onBack={handleBack}
-          onRetry={handleRetry}
-        />
+        <ErrorState message={error} onBack={handleBack} onRetry={handleRetry} />
       </>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <SEOHead 
+      <SEOHead
         title={dynamicSEO.title}
         description={dynamicSEO.description}
         canonicalUrl={dynamicSEO.canonicalUrl}
@@ -417,7 +434,7 @@ function ResultsPage() {
         keywords={dynamicSEO.keywords}
         language={dynamicSEO.language}
       />
-      
+
       <SearchHeader
         searchParams={searchData!.searchParams}
         onBack={handleBack}
@@ -426,7 +443,7 @@ function ResultsPage() {
 
       {/* Progress Bar */}
       {(refreshing || searchProgress) && (
-        <ProgressBar 
+        <ProgressBar
           progress={searchProgress?.progress || 0}
           message={searchProgress?.message || 'Refreshing flight prices...'}
         />
@@ -453,10 +470,7 @@ function ResultsPage() {
 
             {/* Sorting Options */}
             <div className="mb-4 md:mb-6">
-              <SortingOptions
-                value={sortBy}
-                onChange={setSortBy}
-              />
+              <SortingOptions value={sortBy} onChange={setSortBy} />
             </div>
 
             {/* Flight List */}

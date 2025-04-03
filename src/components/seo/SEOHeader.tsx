@@ -17,7 +17,7 @@ interface SEOHeadProps {
   toState?: string;
 }
 
-export function SEOHead({
+export const SEOHeader = ({
   title,
   description,
   canonicalUrl,
@@ -31,7 +31,7 @@ export function SEOHead({
   toCity,
   fromState,
   toState
-}: SEOHeadProps) {
+}: SEOHeadProps) => {
   const baseUrl = 'https://biletaavioni.himatravel.com';
   const fullUrl = canonicalUrl ? `${baseUrl}${canonicalUrl}` : baseUrl;
 
@@ -150,4 +150,4 @@ export function SEOHead({
       {children}
     </Helmet>
   );
-}
+};

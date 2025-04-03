@@ -11,7 +11,7 @@ import {
   Clock,
   Shield
 } from 'lucide-react';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHeader } from '../components/seo/SEOHeader';
 
 export default function AboutPage() {
   // SEO schema for travel agency
@@ -44,7 +44,7 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <SEOHead
+      <SEOHeader
         title="Rreth Nesh | Bileta Avioni Online | Hima Travel | Agjenci Udhëtimi"
         description="Hima Travel, agjencia juaj e besueshme për bileta avioni me çmimet më të mira që nga viti 2011. Ofrojmë bileta avioni, pushime dhe shërbime turistike të personalizuara për çdo udhëtim."
         canonicalUrl="/about"

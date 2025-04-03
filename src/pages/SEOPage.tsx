@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { Navbar } from '../components/Navbar';
 import { GlobalFooter } from '../components/common/GlobalFooter';
 import { supabase } from '../lib/supabase';
-import { SEOHead } from '../components/SEO/SEOHead';
+import { SEOHeader } from '../components/seo/SEOHeader';
 import {
   HeaderComponent,
   FlightSearchComponent,
@@ -55,7 +55,8 @@ export default function SEOPage() {
 
       const { data: initialConnection, error: connError } = await supabase
         .from('seo_location_connections')
-        .select(`
+        .select(
+          `
           *,
           from_location:from_location_id(
             id, type, city, state, nga_format
@@ -66,7 +67,8 @@ export default function SEOPage() {
           template_type:template_type_id(
             id, name, slug
           )
-        `)
+        `
+        )
         .eq('template_url', currentPath)
         .eq('status', 'active')
         .single();
@@ -77,7 +79,8 @@ export default function SEOPage() {
 
         const { data: altConnection, error: altError } = await supabase
           .from('seo_location_connections')
-          .select(`
+          .select(
+            `
             *,
             from_location:from_location_id(
               id, type, city, state, nga_format
@@ -88,7 +91,8 @@ export default function SEOPage() {
             template_type:template_type_id(
               id, name, slug
             )
-          `)
+          `
+          )
           .eq('template_url', pathWithoutSlash)
           .eq('status', 'active')
           .single();
@@ -145,12 +149,13 @@ export default function SEOPage() {
       if (templateError) throw templateError;
       if (!template) throw new Error('Template not found');
 
-      const { data: templateComponents, error: componentsError } = await supabase
-        .from('seo_template_components')
-        .select('*')
-        .eq('template_id', template.id)
-        .eq('status', 'active')
-        .order('display_order');
+      const { data: templateComponents, error: componentsError } =
+        await supabase
+          .from('seo_template_components')
+          .select('*')
+          .eq('template_id', template.id)
+          .eq('status', 'active')
+          .order('display_order');
 
       if (componentsError) throw componentsError;
 
@@ -159,24 +164,28 @@ export default function SEOPage() {
         to_location: connection.to_location
       });
 
-      setPriceTitle(replacePlaceholders('{nga_city} {per_state}', {
-        from_location: connection.from_location,
-        to_location: connection.to_location
-      }));
+      setPriceTitle(
+        replacePlaceholders('{nga_city} {per_state}', {
+          from_location: connection.from_location,
+          to_location: connection.to_location
+        })
+      );
 
-      const formattedDescription = replacePlaceholders(template.meta_description, {
-        from_location: connection.from_location,
-        to_location: connection.to_location
-      });
+      const formattedDescription = replacePlaceholders(
+        template.meta_description,
+        {
+          from_location: connection.from_location,
+          to_location: connection.to_location
+        }
+      );
 
       setTemplateData({
         seo_title: formattedTitle,
         meta_description: formattedDescription,
-        template_type: connection.template_type,
+        template_type: connection.template_type
       });
 
       setComponents(templateComponents || []);
-
     } catch (err) {
       console.error('Error fetching page data:', err);
       setError(err instanceof Error ? err.message : 'Failed to load page');
@@ -210,21 +219,25 @@ export default function SEOPage() {
     let result = text;
 
     // Replace city placeholders
-    result = result.replace(/{nga_city}/g, 
-      locationData.from_location.nga_format || 
-      `Nga ${locationData.from_location.city}`
+    result = result.replace(
+      /{nga_city}/g,
+      locationData.from_location.nga_format ||
+        `Nga ${locationData.from_location.city}`
     );
-    result = result.replace(/{per_city}/g, 
-      locationData.to_location.per_format || 
-      `Për ${locationData.to_location.city}`
+    result = result.replace(
+      /{per_city}/g,
+      locationData.to_location.per_format ||
+        `Për ${locationData.to_location.city}`
     );
-    result = result.replace(/{nga_state}/g, 
-      locationData.from_location.nga_format || 
-      `Nga ${locationData.from_location.state}`
+    result = result.replace(
+      /{nga_state}/g,
+      locationData.from_location.nga_format ||
+        `Nga ${locationData.from_location.state}`
     );
-    result = result.replace(/{per_state}/g, 
-      locationData.to_location.per_format || 
-      `Për ${locationData.to_location.state}`
+    result = result.replace(
+      /{per_state}/g,
+      locationData.to_location.per_format ||
+        `Për ${locationData.to_location.state}`
     );
 
     return result;
@@ -233,15 +246,19 @@ export default function SEOPage() {
   const renderComponent = (component: any) => {
     if (!locationData) return null;
 
-    const fromCity = locationData.from_location.city || locationData.from_location.state;
-    const toCity = locationData.to_location.city || locationData.to_location.state;
+    const fromCity =
+      locationData.from_location.city || locationData.from_location.state;
+    const toCity =
+      locationData.to_location.city || locationData.to_location.state;
 
     switch (component.component_name) {
       case 'SEOHead':
         return (
-          <SEOHead
+          <SEOHeader
             title={seoData?.title || templateData?.seo_title || ''}
-            description={seoData?.description || templateData?.meta_description || ''}
+            description={
+              seoData?.description || templateData?.meta_description || ''
+            }
             canonicalUrl={window.location.pathname}
             schema={seoData?.schema}
             keywords={seoData?.keywords}
@@ -278,7 +295,7 @@ export default function SEOPage() {
           <PricingTableComponent
             fromCity={fromCity}
             toCity={toCity}
-            prices={flightPrices.map(price => ({
+            prices={flightPrices.map((price) => ({
               airline: price.airline,
               date: price.flight_date,
               price: price.total_price
@@ -313,7 +330,7 @@ export default function SEOPage() {
           <RouteInfoComponent
             fromCity={fromCity}
             toCity={toCity}
-            airlines={Array.from(new Set(flightPrices.map(p => p.airline)))}
+            airlines={Array.from(new Set(flightPrices.map((p) => p.airline)))}
             duration="1h 40m"
             title={priceTitle}
             isDirect={true}
@@ -332,9 +349,9 @@ export default function SEOPage() {
         );
 
       case 'FAQComponent':
-        const minPrice = Math.min(...flightPrices.map(p => p.total_price));
-        const maxPrice = Math.max(...flightPrices.map(p => p.total_price));
-        
+        const minPrice = Math.min(...flightPrices.map((p) => p.total_price));
+        const maxPrice = Math.max(...flightPrices.map((p) => p.total_price));
+
         return (
           <FAQComponent
             fromCity={fromCity}
@@ -342,23 +359,23 @@ export default function SEOPage() {
             questions={[
               {
                 question: `Sa kushton një biletë ${priceTitle}?`,
-                answer: `Çmimet për fluturime ${priceTitle} fillojnë nga ${minPrice}€ dhe mund të arrijnë deri në ${maxPrice}€, në varësi të sezonit dhe disponueshmërisë.`,
+                answer: `Çmimet për fluturime ${priceTitle} fillojnë nga ${minPrice}€ dhe mund të arrijnë deri në ${maxPrice}€, në varësi të sezonit dhe disponueshmërisë.`
               },
               {
                 question: `si mund te rezervojme bileta ${priceTitle}?`,
-                answer: `Biletat ${priceTitle} mund ti rezervoni duke kontaktuar me stafin tone.`,
+                answer: `Biletat ${priceTitle} mund ti rezervoni duke kontaktuar me stafin tone.`
               },
               {
                 question: `Cilat kompani ajrore operojnë në këtë rrugë?`,
-                answer: `Kompanitë kryesore që operojnë fluturime ${priceTitle} janë ${Array.from(new Set(flightPrices.map(p => p.airline))).join(', ')}.`,
+                answer: `Kompanitë kryesore që operojnë fluturime ${priceTitle} janë ${Array.from(new Set(flightPrices.map((p) => p.airline))).join(', ')}.`
               },
               {
                 question: `A ka fluturime direkte ${priceTitle}?`,
-                answer: `Kontaktoni me stafin tone tone per tu informuar rreth fluturimeve per bileta avioni ${priceTitle}.`,
+                answer: `Kontaktoni me stafin tone tone per tu informuar rreth fluturimeve per bileta avioni ${priceTitle}.`
               },
               {
                 question: `Kur duhet të rezervoj biletën time?`,
-                answer: `Rekomandohet të rezervoni biletën tuaj të paktën 2-3 muaj përpara për të gjetur çmimet më të mira. Gjatë sezonit të lartë (verë dhe festa), është mirë të rezervoni edhe më herët.`,
+                answer: `Rekomandohet të rezervoni biletën tuaj të paktën 2-3 muaj përpara për të gjetur çmimet më të mira. Gjatë sezonit të lartë (verë dhe festa), është mirë të rezervoni edhe më herët.`
               }
             ]}
             title={priceTitle}
@@ -396,14 +413,14 @@ export default function SEOPage() {
               {
                 text: 'Tirana - London',
                 url: '/bileta-avioni-tirana-ne-london',
-                category: 'Popular',
+                category: 'Popular'
               },
               {
                 text: 'Tirana - Paris',
                 url: '/bileta-avioni-tirana-ne-paris',
-                category: 'Popular',
+                category: 'Popular'
               },
-              { text: 'FAQ', url: '/pyetjet-e-bera-shpesh', category: 'Quick' },
+              { text: 'FAQ', url: '/pyetjet-e-bera-shpesh', category: 'Quick' }
             ]}
             className="mt-12"
           />
@@ -456,17 +473,19 @@ export default function SEOPage() {
     offers: {
       '@type': 'AggregateOffer',
       priceCurrency: 'EUR',
-      lowPrice: Math.min(...flightPrices.map(p => p.total_price) || [50]),
-      highPrice: Math.max(...flightPrices.map(p => p.total_price) || [500]),
+      lowPrice: Math.min(...(flightPrices.map((p) => p.total_price) || [50])),
+      highPrice: Math.max(...(flightPrices.map((p) => p.total_price) || [500])),
       offerCount: flightPrices.length || 10,
-      offers: flightPrices.slice(0, 3).map(price => ({
+      offers: flightPrices.slice(0, 3).map((price) => ({
         '@type': 'Offer',
         price: price.total_price,
         priceCurrency: 'EUR',
         availability: 'https://schema.org/InStock',
         url: window.location.href,
         validFrom: new Date().toISOString(),
-        priceValidUntil: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString()
+        priceValidUntil: new Date(
+          new Date().setDate(new Date().getDate() + 7)
+        ).toISOString()
       }))
     },
     areaServed: {
@@ -490,7 +509,7 @@ export default function SEOPage() {
         name: `Sa kushton një biletë avioni ${priceTitle}?`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: `Çmimet për bileta avioni ${priceTitle} fillojnë nga ${Math.min(...flightPrices.map(p => p.total_price) || [50])}€ dhe mund të ndryshojnë në varësi të sezonit dhe disponueshmërisë.`
+          text: `Çmimet për bileta avioni ${priceTitle} fillojnë nga ${Math.min(...(flightPrices.map((p) => p.total_price) || [50]))}€ dhe mund të ndryshojnë në varësi të sezonit dhe disponueshmërisë.`
         }
       },
       {
@@ -526,10 +545,14 @@ export default function SEOPage() {
       {
         '@type': 'ListItem',
         position: 2,
-        name: locationData.from_location.type === 'city' ? 'Bileta Avioni' : 'Fluturime',
-        item: locationData.from_location.type === 'city' 
-          ? 'https://biletaavioni.himatravel.com/bileta-avioni' 
-          : 'https://biletaavioni.himatravel.com/fluturime'
+        name:
+          locationData.from_location.type === 'city'
+            ? 'Bileta Avioni'
+            : 'Fluturime',
+        item:
+          locationData.from_location.type === 'city'
+            ? 'https://biletaavioni.himatravel.com/bileta-avioni'
+            : 'https://biletaavioni.himatravel.com/fluturime'
       },
       {
         '@type': 'ListItem',
@@ -564,43 +587,61 @@ export default function SEOPage() {
         <meta name="description" content={templateData.meta_description} />
         <meta name="keywords" content={keywords.join(', ')} />
         <link rel="canonical" href={window.location.href} />
-        
+
         {/* Open Graph / Facebook */}
         <meta property="og:type" content="website" />
         <meta property="og:url" content={window.location.href} />
         <meta property="og:title" content={templateData.seo_title} />
-        <meta property="og:description" content={templateData.meta_description} />
-        <meta property="og:image" content="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80" />
+        <meta
+          property="og:description"
+          content={templateData.meta_description}
+        />
+        <meta
+          property="og:image"
+          content="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80"
+        />
         <meta property="og:locale" content="sq_AL" />
         <meta property="og:site_name" content="Hima Travel - Bileta Avioni" />
-        
+
         {/* Twitter */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={templateData.seo_title} />
-        <meta name="twitter:description" content={templateData.meta_description} />
-        <meta name="twitter:image" content="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80" />
-        
+        <meta
+          name="twitter:description"
+          content={templateData.meta_description}
+        />
+        <meta
+          name="twitter:image"
+          content="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&q=80"
+        />
+
         {/* Geo Tags */}
         <meta name="geo.region" content="AL" />
-        <meta name="geo.placename" content={locationData.from_location.city || locationData.from_location.state} />
-        
+        <meta
+          name="geo.placename"
+          content={
+            locationData.from_location.city || locationData.from_location.state
+          }
+        />
+
         {/* Additional Meta Tags */}
         <meta name="author" content="Hima Travel" />
-        <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        <meta
+          name="robots"
+          content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+        />
         <meta name="revisit-after" content="7 days" />
-        
+
         {/* Structured Data */}
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
-        <script type="application/ld+json">
-          {JSON.stringify(faqSchema)}
-        </script>
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbSchema)}
         </script>
       </Helmet>
-      
+
       <Navbar />
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         {components
