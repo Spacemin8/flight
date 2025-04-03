@@ -22,7 +22,7 @@ import { refreshFlightData } from '../utils/flightData';
 import { AdSidebar } from '../components/results/AdSidebar';
 import { MobileAd } from '../components/results/MobileAd';
 import { parseISODate, formatDateForAPI } from '../utils/format';
-import { SEOHeader } from '../components/SEO/SEOHeader';
+import { SEOHeader } from '../components/seo/SEOHeader';
 import { getDefaultSEOData } from '../utils/seo';
 
 function ResultsPage() {
